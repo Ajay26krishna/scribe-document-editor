@@ -1,38 +1,35 @@
-# AI-native development workflow — draft for candidate review
+# AI-native workflow and verification — Scribe
 
-> **Please personalize before submitting.** This note identifies the AI assistance used in the provided starter implementation. Add only hands-on checks, decisions, and fixes you genuinely performed. Do not claim a deployment, browser walkthrough, or tools you have not used.
+**Candidate:** Ajay Krishna Devulapally  
+**Project:** Scribe, Ajaia AI-Native Full Stack Developer assignment
 
-## Tools used
+## Tools and roles
 
-- **ChatGPT (GPT-6):** decomposed the assignment, evaluated scope/trade-offs, drafted the FastAPI/storage/frontend implementation, generated the API tests, and prepared initial documentation.
-- **pytest / FastAPI TestClient:** executed integration-style HTTP tests with temporary SQLite databases to verify the implementation. These are verification tools, not AI tools.
-- **Web documentation:** consulted Quill, Render, and Turso implementation/deployment docs to select a realistic editor and persistent deployment approach.
+- **ChatGPT (GPT-6):** helped narrow the assignment into a manageable product slice; drafted the initial FastAPI API, storage adapter, Quill-based interface, test scaffolding, and documentation; helped diagnose errors and explain deployment steps.
+- **pytest + FastAPI TestClient:** ran the automated checks. **Chrome/browser:** used for local and live end-to-end manual testing. These are verification tools, not AI tools.
+- **GitHub, Render, Turso:** source hosting, deployment, and durable cloud persistence. These are infrastructure services, not AI tools.
 
-## Where AI materially accelerated work
+## Where AI saved time
 
-AI shortened the time spent writing repetitive API routing, Delta validation, SQL setup, the document list/sharing UI, and test scaffolding. I used it to turn the prompt into a small end-to-end product slice instead of building a speculative set of features.
+ChatGPT reduced initial boilerplate work, including routes, validations, the document/sharing interface, persistence wiring, and test cases. More importantly, it helped sequence the work: first get creation, editing, autosave, importing, and sharing working locally; then deploy and prove remote persistence before preparing the final handoff.
 
-## AI-generated material that was changed or rejected
+## AI output I reviewed, fixed, or rejected
 
-- Initially considered a more complex Next.js/Tiptap/ORM path. Chose FastAPI + Quill + SQLite-compatible storage to reduce setup, integrate tests quickly, and make the deployed stack straightforward.
-- Intentionally rejected a raw HTML import/storage model. Kept Quill Delta JSON and server-side restrictions on inserted content to reduce script-injection risks.
-- A generated test configuration initially failed to import the application when run with `pytest`; adding explicit `pythonpath` in `pytest.ini` corrected test discovery/imports.
-- Rejected deploying a free Render service with local SQLite as a persistence solution because files are ephemeral; prepared a remote Turso configuration instead.
+1. **Italic formatting bug:** bold and other editor formats worked, but italic did not display correctly. I tested the problem in the browser and changed `font-synthesis: none` to `auto`, plus loaded actual italic font variants from Google Fonts. I confirmed italic rendering worked afterward.
+2. **Test setup:** initial pytest import/discovery needed a `pythonpath` configuration in `pytest.ini`. The test suite was rerun after the correction.
+3. **Persistence/deployment decision:** local SQLite was appropriate for development but not sufficient on Render's ephemeral free filesystem. I used Turso for the deployed database instead of accepting a demo that would lose documents on service restarts.
+4. **Scope choices:** rejected an attempt to recreate full Google Docs features. Real-time coauthoring, `.docx`, comments, OAuth, and version history were postponed in favor of working role-based sharing and saved rich text.
 
-## What was actually verified so far
+## How I verified the result
 
-- `pytest -q`: **7 passing tests** on local SQLite, including permissions, sharing/revocation, file import, stale revision rejection, and formatted content round trips.
-- `node --check static/app.js`: passed JavaScript syntax validation.
-- Local `/healthz`: responded with status OK in the development environment.
-- A local browser smoke check rendered the dashboard and exercised the owned/shared filter using a test API bridge; this is not a substitute for testing the live Quill editor in a normal browser.
+- Ran the local automated tests: **7 passing tests**, including document operations, formatted content round trips, sharing permissions, and remote-adapter serialization.
+- Tested Scribe locally on Windows, including document creation, formatting, italic, save/reopen, import, and the two demo accounts.
+- Deployed the project using GitHub and Render, configured the database via environment variables, and tested the live website's primary workflows.
+- Opened `/healthz` on the deployed service and confirmed the storage mode was **`turso`**.
+- Created a persistence test document through the live website and verified that the corresponding row was present in the hosted Turso database. I treated that readback as stronger evidence than a dashboard usage counter.
 
-## Candidate verification before submission — complete yourself
+## Limits and judgment
 
-- [ ] Run the project locally in your normal browser and test **rich text formatting**, autosave after typing, refresh, and reopening.
-- [ ] Verify the share invitation with both demo user accounts, including editor versus viewer restrictions.
-- [ ] Upload sample `.txt` and `.md` files; check what happens with unsupported files.
-- [ ] Deploy to Render with a persistent Turso database; perform a full remote persistence test.
-- [ ] Inspect visual design on desktop and narrow screens; correct any UX issues found.
-- [ ] Record the product walkthrough only after verifying these outcomes.
+The tests do not prove full production security or simultaneous collaboration. Demo account switching is intentionally simulated. The remote adapter has protocol-level automated coverage and live manual verification, but not an automated end-to-end integration suite against a disposable Turso instance. The next quality additions would be actual identity enforcement, better conflict recovery, and Playwright UI regression tests.
 
-The AI was a coding accelerator, not the product owner or the source of truth. Decisions about scope and correctness should ultimately be supported by demonstrable behavior, tests, and a candid explanation of limitations.
+**Use of AI was disclosed rather than hidden.** I treated generated code as a starting implementation, checked behavior manually, fixed defects, and made the deployment and scope decisions needed to ship a working product slice.
