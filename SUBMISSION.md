@@ -8,7 +8,7 @@
 - **Live product (no signup):** https://scribe-document-editor.onrender.com/
 - **Public GitHub source:** https://github.com/Ajay26krishna/scribe-document-editor
 - **Google Drive folder:** https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
-- **3–5 minute walkthrough:** **PENDING — link to be inserted after recording** (also in `walkthrough_url.txt`)
+- **3–5 minute walkthrough:** https://youtu.be/QPelKQ8fE3Y (unlisted; verify playback before submitting)
 
 The Google Drive folder has **Anyone with the link → Viewer** permission enabled. The repository is public. No payments or external account creation are necessary for testing Scribe.
 
@@ -25,7 +25,7 @@ The Google Drive folder has **Anyone with the link → Viewer** permission enabl
 
 ## Exactly what is included in this Drive folder
 
-- **`Scribe_Ajaia_Final_Source.zip`** — clean, complete source snapshot with the PDF/history features, code, tests, assets, deployment configuration, and these documents. No environment tokens, local SQLite database, or caches.
+- **`Scribe_Ajaia_Final_Submission_Source.zip`** — clean, complete source snapshot with the PDF/history features, code, tests, assets, deployment configuration, and these documents. No environment tokens, local SQLite database, or caches.
 - **Individual project files:** `main.py`, `storage.py`, `importer.py`, `requirements.txt`, `requirements-dev.txt`, `pytest.ini`, `render.yaml`, and the `static/`, `tests/`, and `screenshots/` folders. The ZIP is the preferred source download.
 - **`README.md`** — quick start, full local setup, feature list, limitations, and deployment information.
 - **`ARCHITECTURE.md`** — architecture, persistence, authorization, revision management, and trade-offs.
@@ -33,7 +33,7 @@ The Google Drive folder has **Anyone with the link → Viewer** permission enabl
 - **`SUBMISSION.md`** — this document with reviewer links and complete manifest.
 - **`WALKTHROUGH_SCRIPT.md`** — narrated 4–5 minute script with on-screen instructions in brackets.
 - **`live_url.txt`** — verified deployment address provided by the candidate.
-- **`walkthrough_url.txt`** — reserved for the unlisted video URL (recording pending).
+- **`walkthrough_url.txt`** — unlisted walkthrough link: https://youtu.be/QPelKQ8fE3Y.
 - **`sample-import.md`** — Markdown upload sample.
 
 ## Functional status
@@ -48,7 +48,7 @@ The Google Drive folder has **Anyone with the link → Viewer** permission enabl
 | Version history (stretch) | Last 30 saved revisions, formatted preview, owner-only restore, revision conflict protection; candidate tested locally and reports live version working |
 | Automated testing | 12 pytest tests passed after the update |
 | Live deployment | https://scribe-document-editor.onrender.com/ |
-| Walkthrough video | **Not yet recorded / link pending** |
+| Walkthrough video | Recorded and uploaded; https://youtu.be/QPelKQ8fE3Y (availability pending YouTube processing) |
 
 ## Constraints, known limitations, and next 2–4 hours
 
