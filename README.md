@@ -3,11 +3,18 @@
 > **Ajaia AI-Native Full Stack Developer Assignment**  
 > Candidate: Ajay Krishna Devulapally
 
-Scribe is a deliberately scoped document editor: create or import documents, format and autosave text, share access with a teammate, and reopen content with its formatting intact.
+Scribe is a deliberately scoped document editor: create or import documents, format and autosave text, share access with a teammate, and reopen content with its formatting intact. It also offers browser PDF export and recent version history.
+
+## Reviewer links
+
+- **Live product:** https://scribe-document-editor.onrender.com/
+- **Source code:** https://github.com/Ajay26krishna/scribe-document-editor
+- **Google Drive submission folder:** https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
+- **Walkthrough video:** pending recording (see `walkthrough_url.txt`).
 
 ## 60-second reviewer quick start
 
-1. Open the **live URL** in `SUBMISSION.md` (the candidate must paste the final Render URL before submission).
+1. Open the **live product** above; no installation, payment, or login is required.
 2. The default account is **Maya Chen**. Open **Welcome to Scribe**, format text, wait for **All changes saved**, then refresh to confirm persistence.
 3. Create a document, click **Share**, select **Noah Patel** and **Can edit**, and click **Grant access**.
 4. Switch the top-right demo account to **Noah Patel**. The document appears under **Shared with me** and is editable. Switch back to Maya to revoke access.
@@ -171,4 +178,4 @@ scribe-assignment/
 
 ## AI use and responsible attribution
 
-ChatGPT was used for scoping, implementation scaffolding, debugging, tests, documentation, and the subsequent PDF/history enhancements. Italic rendering was corrected and the original live editor/Render/Turso workflows were manually validated. The history backend has local automated coverage; **the new features should be manually retested on the actual deployed URL after deployment**. See `AI_WORKFLOW.md` for specific disclosure.
+ChatGPT was used for scoping, implementation scaffolding, debugging, tests, documentation, and the subsequent PDF/history enhancements. Italic rendering was corrected and the original live editor/Render/Turso workflows were manually validated. The new PDF export and version history controls have also been tested locally and reported working on the updated live deployment. Automated history tests cover persistence and access rules; see `AI_WORKFLOW.md` for validation scope. See `AI_WORKFLOW.md` for specific disclosure.
