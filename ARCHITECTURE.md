@@ -2,7 +2,9 @@
 
 **Project:** Scribe — lightweight shared document workspace  
 **Assignment:** Ajaia AI-Native Full Stack Developer  
-**Source:** https://github.com/Ajay26krishna/scribe-document-editor
+**Source:** https://github.com/Ajay26krishna/scribe-document-editor  
+**Live application:** https://scribe-document-editor.onrender.com/  
+**Submission materials:** https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
 
 ## Product scope and priorities
 
@@ -48,6 +50,6 @@ SQLite locally       Turso/libSQL over HTTPS on Render
 - **Version history design:** SQLite/libSQL `AFTER INSERT` and `AFTER UPDATE` triggers atomically snapshot a document each time its data is saved. The `document_versions` table stores `(doc_id, revision, title, delta_json, saved_at)`; it keeps the newest 30 revisions. On upgrade, existing documents are backfilled from their current state once. Restoring an old snapshot increments the current revision and also saves the restored state as a new version. A `current_revision` precondition prevents racing another editor. Anyone with access can preview history; only the owner can restore.
 - **PDF design:** a frontend print action and `@media print` CSS remove the app chrome and let the rich-text page flow across printed sheets. No PDF library, backend storage, or build step is needed. Users select Save as PDF in the browser dialog.
 - **Next:** (1) real authentication and invitations, (2) improved stale-draft conflict recovery and diff/compare UI, (3) browser-level Playwright tests and accessibility improvements.
-- **Verification boundary:** history endpoints and SQLite migration are covered by automated tests; the new features still require a manual production-browser check against the configured Turso database before presenting them as verified live.
+- **Verification boundary:** the candidate tested PDF export and version history locally and confirmed that the updated Render interface works. Automated tests cover history and local schema migration; the test suite does not perform full browser automation or a disposable remote Turso migration test.
 
 **Operational warning:** Because the identity switcher is available to all demo visitors, the live environment is a functional evaluation demo, not a private document store. Do not enter confidential information.
