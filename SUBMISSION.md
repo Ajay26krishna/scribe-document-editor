@@ -1,67 +1,64 @@
-# Ajaia AI-Native Full Stack Developer Assignment — Submission
+# Ajaia — AI-Native Full Stack Developer Assignment — Submission
 
 **Candidate:** Ajay Krishna Devulapally  
 **Project:** Scribe — lightweight shared document workspace
 
-## Links — fill in before submitting
+## Reviewer links
 
-- **Google Drive folder:** TODO — paste the shareable folder URL
-- **Live product URL:** TODO — paste your deployed Render URL after completing its smoke test
-- **3–5 minute walkthrough:** TODO — paste the same video URL saved in `walkthrough_url.txt`
+- **Live product URL:** `PASTE_YOUR_WORKING_RENDER_URL_HERE`
+- **Source code (public GitHub):** https://github.com/Ajay26krishna/scribe-document-editor
+- **Google Drive submission folder:** `PASTE_SHARED_GOOGLE_DRIVE_FOLDER_URL_HERE`
+- **3–5 minute video walkthrough:** `PASTE_UNLISTED_VIDEO_URL_HERE`
 
-## Exactly what this folder contains
+## How to review in 60 seconds
 
-- `main.py` — API, server permissions and validation
-- `storage.py` — local SQLite and remote Turso persistence
-- `importer.py` — limited `.txt` / `.md` to Quill Delta importer
-- `static/index.html`, `static/app.js`, `static/styles.css` — frontend
-- `tests/test_app.py`, `tests/test_remote_adapter.py`, `pytest.ini` — automated API tests
-- `requirements.txt`, `requirements-dev.txt` — dependencies
-- `.env.example`, `.gitignore`, `render.yaml` — environment/deployment configuration
-- `README.md` — setup, reviewer instructions, limitations, and deployment steps
-- `ARCHITECTURE.md` — architecture and prioritized trade-offs
-- `AI_WORKFLOW.md` — AI usage and verification note (candidate review required)
-- `WALKTHROUGH_SCRIPT.md` — video recording outline
-- `walkthrough_url.txt` — walkthrough URL (pending replacement)
-- `sample-import.md` — sample file for the import demonstration
-- `screenshots/dashboard.png` — screenshot of the dashboard with seeded local data
+1. Open the **live product URL** above; no signup or payment is needed.
+2. Select **Maya Chen** (`maya@demo.scribe`) in the account switcher. Create and format a document; wait for autosave and refresh to confirm persistence.
+3. Click **Share**, grant **Noah Patel** (`noah@demo.scribe`) **Can edit**, then switch to Noah and find the document under **Shared with me**.
+4. Change Noah's role to **Can view** to demonstrate read-only access.
+5. Click **Import file** to upload a UTF-8 `.txt` or `.md` file (maximum 512 KB).
 
-`data/*.sqlite3` databases, credentials, Python cache, and virtual environment files are intentionally excluded.
+**Access model:** The two accounts are simulated and selectable with no password. This is deliberate for evaluating the sharing workflow, not production authentication. Do not enter confidential content in this demo.
 
-## Reviewer access
+## Exactly what the Google Drive folder contains
 
-No password is necessary: use the **Viewing as** dropdown to switch between `maya@demo.scribe` and `noah@demo.scribe`. These are seeded demonstration accounts, not production authentication. The live website should not contain sensitive information.
+1. `Scribe_Ajaia_Final_Source.zip` — source code, tests, static assets, deployment configuration, documentation, sample import file, and screenshot; excludes virtual environments, local databases, secrets, and caches.
+2. `README.md` — reviewer quick start, Windows/local setup, architecture overview, feature status, limitations, and deployment instructions.
+3. `ARCHITECTURE.md` — architectural decisions, data model, permissions, autosave, and scope trade-offs.
+4. `AI_WORKFLOW.md` — AI tools used, what was changed, and verification actually performed.
+5. `SUBMISSION.md` — this manifest and reviewer-access instructions.
+6. `WALKTHROUGH_SCRIPT.md` — narrated video script with on-screen cues.
+7. `walkthrough_url.txt` — unlisted walkthrough URL (**replace placeholder after recording**).
+8. `live_url.txt` — live Render URL (**replace placeholder before submission**).
+9. `dashboard.png` — dashboard preview.
+10. `sample-import.md` — example import file.
 
-## Feature status (update after deployment)
+## Implemented and verified
 
-| Capability | Status |
+| Requirement | Status |
 | --- | --- |
-| Create, rename, edit, delete, and reopen | Implemented; local API tests pass |
-| Rich-text formatting + autosave | Implemented; browser end-to-end manual check pending |
-| `.txt`/`.md` import | Implemented; API tests pass (limited Markdown syntax) |
-| Share with viewer/editor role + revoke | Implemented; API tests pass |
-| Backend permission checks | Implemented; API tests pass |
-| SQLite local persistence | Implemented; API tests pass |
-| Hosted Turso persistence | Implementation prepared; live smoke test pending |
-| Public deployment | **Not yet completed** |
-| Walkthrough recording | **Not yet completed** |
+| Create / rename / edit / save / reopen | Working locally and in the deployed browser |
+| Rich text: bold, italic, underline, headings, lists | Working; italic rendering issue corrected |
+| Autosave and preserved formatting | Working in local and live manual testing |
+| Import UTF-8 `.txt` / `.md` | Working; intentionally limited Markdown subset |
+| Owner / editor / viewer permissions | Working, with backend checks; demo identity switcher |
+| Local persistence | SQLite |
+| Hosted persistence | Turso; `/healthz` confirms Turso and SQL readback confirms writes |
+| Deployment | Render web service, functioning in browser |
+| Automated tests | Seven passing tests for key API behavior and adapter protocol |
+| Walkthrough video | Link pending recording |
 
-## Not implemented (intentional cuts)
+## Deliberate exclusions and next 2–4 hours
 
-Real sign-in/OAuth, `.docx` import, complete Markdown parsing, live simultaneous editing, comments, version history, PDF export, public links, and production-grade account security.
+No real OAuth/login, emailed invitations, simultaneous editing, comments, version history, `.docx` import, complete Markdown rendering, or PDF export. With additional time I would add real authentication/invitations, safer conflict recovery with revision history, and Playwright end-to-end browser tests.
 
-## Next 2–4 hours
+## Local setup (Windows PowerShell)
 
-1. Real authentication and invitation identity instead of demo switching.
-2. Improved conflict/recovery UX and document revision history.
-3. Automated browser tests and self-hosted Quill assets.
-
-## Local run
-
-```bash
-pip install -r requirements.txt
-uvicorn main:app --reload
-# Open http://127.0.0.1:8000/
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
-Tests: `pip install -r requirements-dev.txt && pytest -q`. See `README.md` for full deployment instructions.
+Open http://127.0.0.1:8000. Full instructions are in `README.md`.
