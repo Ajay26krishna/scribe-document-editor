@@ -24,13 +24,19 @@ ChatGPT reduced initial boilerplate work, including routes, validations, the doc
 ## How I verified the result
 
 - Ran the local automated tests: **12 passing tests**, including document operations, formatted content round trips, sharing permissions, remote-adapter serialization, history snapshot retention, owner-only restore, conflict detection, and upgrading a pre-history database.
-- Tested Scribe locally on Windows, including document creation, formatting, italic, save/reopen, import, and the two demo accounts.
-- Deployed the project using GitHub and Render, configured the database via environment variables, and tested the live website's primary workflows.
+- Tested Scribe locally on Windows, including document creation, formatting, italic, save/reopen, import, both demo accounts, PDF export, and version history preview/restore.
+- Deployed the project using GitHub and Render, configured the database via environment variables, and tested the live website's primary workflows. After merging the PDF/history pull request, verified that the updated deployed interface was accessible.
 - Opened `/healthz` on the deployed service and confirmed the storage mode was **`turso`**.
 - Created a persistence test document through the live website and verified that the corresponding row was present in the hosted Turso database. I treated that readback as stronger evidence than a dashboard usage counter.
 
 ## Limits and judgment
 
-The tests do not prove full production security or simultaneous collaboration. Demo account switching is intentionally simulated. The remote adapter has protocol-level automated coverage and the **original** deployment has live manual verification, but not an automated end-to-end integration suite against a disposable Turso instance. The new print/history UI and Turso migration **must be checked on the redeployed site**. The next quality additions would be actual identity enforcement, better conflict recovery, and Playwright UI regression tests.
+The tests do not prove full production security or simultaneous collaboration. Demo account switching is intentionally simulated. The remote adapter has protocol-level automated coverage and the **original** deployment has live manual verification, but not an automated end-to-end integration suite against a disposable Turso instance. The updated live UI was checked after redeployment; no automated end-to-end browser suite or isolated remote Turso migration test was run. The next quality additions would be actual identity enforcement, better conflict recovery, and Playwright UI regression tests.
 
 **Use of AI was disclosed rather than hidden.** I treated generated code as a starting implementation, checked behavior manually, fixed defects, and made the deployment and scope decisions needed to ship a working product slice.
+
+## Final project links
+
+- Live application: https://scribe-document-editor.onrender.com/
+- Source: https://github.com/Ajay26krishna/scribe-document-editor
+- Submission materials: https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
