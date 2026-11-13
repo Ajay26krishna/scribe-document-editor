@@ -5,56 +5,54 @@
 
 ## Reviewer links
 
-- **Live product URL:** `PASTE_YOUR_WORKING_RENDER_URL_HERE`
-- **Source code (public GitHub):** https://github.com/Ajay26krishna/scribe-document-editor
-- **Google Drive submission folder:** https://drive.google.com/drive/folders/15yG8FJSZvjVO4L07SZjb0q-IKroBUhyO (enable Viewer link access before submitting)
-- **3–5 minute video walkthrough:** `PASTE_UNLISTED_VIDEO_URL_HERE`
+- **Live product (no signup):** https://scribe-document-editor.onrender.com/
+- **Public GitHub source:** https://github.com/Ajay26krishna/scribe-document-editor
+- **Google Drive folder:** https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
+- **3–5 minute walkthrough:** **PENDING — link to be inserted after recording** (also in `walkthrough_url.txt`)
 
-## How to review in 60 seconds
+The Google Drive folder has **Anyone with the link → Viewer** permission enabled. The repository is public. No payments or external account creation are necessary for testing Scribe.
 
-1. Open the **live product URL** above; no signup or payment is needed.
-2. Select **Maya Chen** (`maya@demo.scribe`) in the account switcher. Create and format a document; wait for autosave and refresh to confirm persistence.
-3. Click **Share**, grant **Noah Patel** (`noah@demo.scribe`) **Can edit**, then switch to Noah and find the document under **Shared with me**.
-4. Change Noah's role to **Can view** to demonstrate read-only access.
-5. Click **Import file** to upload a UTF-8 `.txt` or `.md` file (maximum 512 KB).
-6. On any document use **⋯ → Export to PDF** and select **Save as PDF** in the browser print dialog.
-7. Open **⋯ → Version history** to preview previous saves; as the document owner, choose an older revision and restore it as a new revision.
+## Reviewer quick start
 
-**Access model:** The two accounts are simulated and selectable with no password. This is deliberate for evaluating the sharing workflow, not production authentication. Do not enter confidential content in this demo.
+1. Visit the live product and use the top-right account switcher. Default: **Maya Chen** (`maya@demo.scribe`); second user: **Noah Patel** (`noah@demo.scribe`). No passwords are needed.
+2. As Maya, create and rename a document, apply bold/italic/underline, headings and lists, wait for **All changes saved**, refresh, and reopen it.
+3. Click **Share**, grant Noah **Can edit**, switch to Noah, and open **Shared with me**. Make an edit. Switch back to Maya and change Noah's role to **Can view**; return to Noah to verify read-only behavior.
+4. Import `sample-import.md` or a UTF-8 `.txt` file (512 KB maximum).
+5. From a document's **⋯** menu, choose **Export to PDF**, then **Save as PDF** in Chrome or Edge's print dialog.
+6. From the same menu open **Version history**. Preview previous saved revisions; as the document owner, restore an older revision. This creates a new revision while keeping retained older revisions.
 
-## Exactly what the Google Drive folder contains
+**Security/scope note:** The account switcher simulates identity for demonstration; it is not production authentication. Do not enter sensitive data. Simultaneous coauthoring is not implemented.
 
-1. `Scribe_Ajaia_Final_Source.zip` — source code, tests, static assets, deployment configuration, documentation, sample import file, and screenshot; excludes virtual environments, local databases, secrets, and caches.
-2. `README.md` — reviewer quick start, Windows/local setup, architecture overview, feature status, limitations, and deployment instructions.
-3. `ARCHITECTURE.md` — architectural decisions, data model, permissions, autosave, and scope trade-offs.
-4. `AI_WORKFLOW.md` — AI tools used, what was changed, and verification actually performed.
-5. `SUBMISSION.md` — this manifest and reviewer-access instructions.
-6. `WALKTHROUGH_SCRIPT.md` — narrated video script with on-screen cues.
-7. `walkthrough_url.txt` — unlisted walkthrough URL (**replace placeholder after recording**).
-8. `live_url.txt` — live Render URL (**replace placeholder before submission**).
-9. `dashboard.png` — dashboard preview.
-10. `sample-import.md` — example import file.
+## Exactly what is included in this Drive folder
 
-## Implemented and verified
+- **`Scribe_Ajaia_Final_Source.zip`** — clean, complete source snapshot with the PDF/history features, code, tests, assets, deployment configuration, and these documents. No environment tokens, local SQLite database, or caches.
+- **Individual project files:** `main.py`, `storage.py`, `importer.py`, `requirements.txt`, `requirements-dev.txt`, `pytest.ini`, `render.yaml`, and the `static/`, `tests/`, and `screenshots/` folders. The ZIP is the preferred source download.
+- **`README.md`** — quick start, full local setup, feature list, limitations, and deployment information.
+- **`ARCHITECTURE.md`** — architecture, persistence, authorization, revision management, and trade-offs.
+- **`AI_WORKFLOW.md`** — ChatGPT usage, bugs fixed, rejected scope, and validation.
+- **`SUBMISSION.md`** — this document with reviewer links and complete manifest.
+- **`WALKTHROUGH_SCRIPT.md`** — narrated 4–5 minute script with on-screen instructions in brackets.
+- **`live_url.txt`** — verified deployment address provided by the candidate.
+- **`walkthrough_url.txt`** — reserved for the unlisted video URL (recording pending).
+- **`sample-import.md`** — Markdown upload sample.
 
-| Requirement | Status |
+## Functional status
+
+| Requirement | State |
 | --- | --- |
-| Create / rename / edit / save / reopen | Working locally and in the deployed browser |
-| Rich text: bold, italic, underline, headings, lists | Working; italic rendering issue corrected |
-| Autosave and preserved formatting | Working in local and live manual testing |
-| Import UTF-8 `.txt` / `.md` | Working; intentionally limited Markdown subset |
-| Owner / editor / viewer permissions | Working, with backend checks; demo identity switcher |
-| Local persistence | SQLite |
-| Hosted persistence | Turso; `/healthz` confirms Turso and SQL readback confirms writes |
-| Deployment | Render web service, functioning in browser |
-| Automated tests | Twelve passing tests, including history migration, restoration, retention and permissions |
-| Browser PDF export (stretch) | Implemented; verify using Chrome/Edge Print → Save as PDF on the deployed URL |
-| Bounded version history (stretch) | Implemented, local API tests pass; production Turso redeploy and manual verification pending |
-| Walkthrough video | Link pending recording |
+| Create, rename, rich-text edit, autosave, and reopen | Implemented; manually tested locally and live |
+| Import `.txt` and basic `.md` | Implemented; 512 KB UTF-8 size/type validation |
+| Document ownership and sharing | Backend owner/editor/viewer enforcement; two selectable demo users |
+| Persistence | SQLite for local use; Turso/libSQL on Render; remote document readback confirmed |
+| Browser PDF export (stretch) | Implemented using print CSS and Print → Save as PDF; candidate tested locally and reports live version working |
+| Version history (stretch) | Last 30 saved revisions, formatted preview, owner-only restore, revision conflict protection; candidate tested locally and reports live version working |
+| Automated testing | 12 pytest tests passed after the update |
+| Live deployment | https://scribe-document-editor.onrender.com/ |
+| Walkthrough video | **Not yet recorded / link pending** |
 
-## Deliberate exclusions and next 2–4 hours
+## Constraints, known limitations, and next 2–4 hours
 
-No real OAuth/login, emailed invitations, simultaneous editing, comments, `.docx` import, or complete Markdown rendering. PDF uses the browser print dialog rather than a server-generated PDF file; history retains the last 30 **saved** revisions, and initial upgrade history starts from the document state at migration. With additional time I would add real authentication/invitations, unsaved-draft conflict recovery and version diffing, and Playwright end-to-end browser tests.
+Intentional exclusions: OAuth/login, private identity verification, email invitations, real-time simultaneous editing, comments, full Markdown conversion, and `.docx` import. The PDF feature uses a browser print dialog rather than a server-side PDF converter. Version history tracks saved revisions (up to 30), not each keystroke; migration of an existing document starts from its state when history was enabled. The next priorities would be real authentication, improved conflict recovery and side-by-side diffing, and Playwright browser tests.
 
 ## Local setup (Windows PowerShell)
 
@@ -65,4 +63,4 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
-Open http://127.0.0.1:8000. Full instructions are in `README.md`.
+Open `http://127.0.0.1:8000`. Full instructions are in `README.md`.
