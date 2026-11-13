@@ -12,6 +12,8 @@ Scribe is a deliberately scoped document editor: create or import documents, for
 3. Create a document, click **Share**, select **Noah Patel** and **Can edit**, and click **Grant access**.
 4. Switch the top-right demo account to **Noah Patel**. The document appears under **Shared with me** and is editable. Switch back to Maya to revoke access.
 5. Import a UTF-8 `.txt` or `.md` file using **Import file** in the left sidebar.
+6. Open a document, click **⋯ → Export to PDF** to open Chrome/Edge’s print dialog. Choose **Save as PDF**.
+7. Open **⋯ → Version history** to preview saved revisions. The owner can restore a previous version without deleting the more recent revisions.
 
 ### Seeded demo accounts (no passwords)
 
@@ -70,7 +72,7 @@ pip install -r requirements-dev.txt
 pytest -q
 ```
 
-The automated tests cover document CRUD and formatted content persistence, optimistic concurrency conflicts, per-user access enforcement, share/editor/viewer roles and revocation, Markdown/text imports, and server-side Delta validation.
+The **12 automated tests** cover document CRUD and formatted content persistence, optimistic concurrency conflicts, per-user access enforcement, share/editor/viewer roles and revocation, Markdown/text imports, server-side Delta validation, version snapshots and restoration, history permissions, retention, and migration from an existing database. The new PDF flow uses the browser print dialog and needs a quick visual check in Chrome/Edge.
 
 **API documentation:** `http://127.0.0.1:8000/docs` (FastAPI Swagger UI). **Health check:** `http://127.0.0.1:8000/healthz`.
 
@@ -94,7 +96,7 @@ The automated tests cover document CRUD and formatted content persistence, optim
    ```
 
 5. Deploy. Wait for Render's deployment to finish, then open the provided `https://…onrender.com` URL. The first request may have a cold start.
-6. **Smoke-test on the deployed URL:** make a document, change formatting, wait for autosave, refresh; switch to Noah and verify that only shared documents are accessible; refresh again to verify remote persistence.
+6. **Smoke-test on the deployed URL:** make a document, change formatting, wait for autosave, refresh; switch to Noah and verify that only shared documents are accessible; refresh again to verify remote persistence. Check **⋯ → Version history**, preview and restore an older revision as Maya, and use **⋯ → Export to PDF** to verify the printed output.
 7. Copy the deployed URL into `SUBMISSION.md` and your Google Drive handoff.
 
 **Important:** **Deployment verified by the candidate:** The live Render application returned `{"status":"ok","storage":"turso"}` at `/healthz`, and a newly created document was confirmed in Turso database records. Reviewers do not need a paid account. Never commit the Turso token.
@@ -114,14 +116,18 @@ Documentation: [Render FastAPI deployment](https://render.com/docs/deploy-fastap
 | Backend permissions | Unauthorized documents are omitted; viewer edits rejected; owner-only share/delete operations |
 | Validation | 1–120 character titles, import types/size, Delta text/attributes, content-size limits |
 | Seed data | One owned document and one read-only shared document visible at startup |
-| Experience | Responsive dashboard, document editor, sharing modal, error toasts |
+| PDF export (stretch) | **⋯ → Export to PDF** opens the native browser Print dialog; select **Save as PDF** (no server-side PDF dependency) |
+| Version history (stretch) | Last 30 saved revisions, formatted read-only preview, owner-only restore as a new revision; compatible with existing local/Turso databases |
+| Experience | Responsive dashboard, document editor, sharing modal, history modal, error toasts |
 
 ### Constraints / intentional exclusions
 
 - Markdown support is **not a complete Markdown implementation**; tables, images, links, nested lists, fenced code blocks, and other extensions are not converted to rich formats. They are preserved as plain editable text when possible.
 - Only UTF-8 `.txt`/`.md` imports, maximum **512 KB**. No `.docx` or attachment storage. The editor accepts a maximum of 100,000 text characters / 250 KB serialized Delta.
 - Quill is loaded from an external CDN to minimize build setup. Browser access to jsDelivr is required.
-- No real login/passwords/OAuth, email invitations, public links, live multi-cursor collaboration, comments, version history, PDF export, backups, or rate limiting.
+- No real login/passwords/OAuth, email invitations, public links, live multi-cursor collaboration, comments, automatic backup service, or rate limiting.
+- **PDF export is browser print-to-PDF**, not a server-generated file: open the Print dialog and choose Save as PDF. Print output depends on the browser/printer settings.
+- **History records successful autosaves**, not per-keystroke edits. Only the latest 30 revisions are kept; existing documents gain an initial snapshot of their current state when the feature is enabled, not historical states predating it. Viewers/editors can preview shared revisions; only owners can restore.
 - Conflict behavior is **detect and reject**, not merge: simultaneous stale updates get HTTP `409`; the editor notifies the user to reopen. This avoids silent overwrites but is not real-time collaboration.
 - Demo switching is accessible to all; never store sensitive information in this assignment deployment.
 - A shared document link still requires the account to be granted access. Copying a link alone does not grant permission.
@@ -129,7 +135,7 @@ Documentation: [Render FastAPI deployment](https://render.com/docs/deploy-fastap
 ### What I would build with another 2–4 hours
 
 1. Real authentication/session handling (e.g. Auth.js or OAuth), server-verified identity and invitation email flow.
-2. Better conflict UX with draft recovery and optional version snapshots instead of an error-only response.
+2. Better conflict UX with local unsaved-draft recovery and side-by-side version comparison; history already preserves successful saves but a stale unsaved draft can still require manual recovery.
 3. Playwright browser regression tests for editor formatting, import, reload, and share flows; self-hosted Quill assets for offline reliability.
 
 ## Folder map
@@ -145,7 +151,8 @@ scribe-assignment/
 │   └── styles.css          # Responsive design
 ├── tests/
 │   ├── test_app.py         # Local API tests
-│   └── test_remote_adapter.py  # Hosted adapter protocol test
+│   ├── test_remote_adapter.py  # Hosted adapter protocol test
+│   └── test_version_history.py  # Migration, snapshots, restore/access tests
 ├── screenshots/
 │   └── dashboard.png       # Dashboard preview
 ├── sample-import.md       # Demo file to import
@@ -164,4 +171,4 @@ scribe-assignment/
 
 ## AI use and responsible attribution
 
-ChatGPT was used for scoping, implementation scaffolding, debugging, tests, and documentation. The candidate reviewed and corrected italic rendering, manually tested local and deployed behavior, configured Render + Turso, and verified a persisted document directly in the hosted database. See `AI_WORKFLOW.md` for a specific disclosure.
+ChatGPT was used for scoping, implementation scaffolding, debugging, tests, documentation, and the subsequent PDF/history enhancements. Italic rendering was corrected and the original live editor/Render/Turso workflows were manually validated. The history backend has local automated coverage; **the new features should be manually retested on the actual deployed URL after deployment**. See `AI_WORKFLOW.md` for specific disclosure.
