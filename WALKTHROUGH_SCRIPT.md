@@ -1,21 +1,63 @@
-# Suggested 3–5 minute walkthrough (record after verifying the deployment)
+# Scribe — 4–5 minute walkthrough script
 
-**0:00–0:25 — Intent and scope**  
-"I built Scribe as a focused document workspace. I prioritized a clean write-save-share flow rather than reimplementing every Google Docs feature."
+**Before recording:** Open the deployed Scribe URL in Chrome and enlarge it to comfortable zoom. Keep a code editor ready on `main.py`, `storage.py`, and `tests/test_app.py`; keep Turso open on the `documents` table or SQL editor. Hide tabs that expose credentials, tokens, or private accounts. Start with **Maya Chen** selected. Use the `sample-import.md` file from the project. The words in **bold brackets** tell you what to show on screen, not what to read aloud.
 
-**0:25–1:25 — Create, edit, autosave, reopen**  
-Start as Maya. Create a document, rename it, type paragraphs, apply bold / heading / list formatting, wait for *All changes saved*, go back to the dashboard, reopen. Refresh the live page to demonstrate persistence.
+## 0:00–0:25 — Product and scope
 
-**1:25–2:05 — File import**  
-Import `sample-import.md` or a small `.txt` file. Explain that `.md` is limited to basic formatting and `.docx` support was intentionally excluded.
+**[SCREEN: Show deployed Scribe dashboard, move cursor over New document, Import file, My documents, and Shared with me.]**
 
-**2:05–3:10 — Share and permission check**  
-Click Share as Maya; invite Noah with *Can edit*. Switch account from the top-right and find it in *Shared with me*. Modify the document as Noah. Switch back to Maya, set the permission to *Can view*. Switch to Noah; show disabled editing. Finally revoke access and demonstrate that Noah can no longer open the document.
+"Hi, I'm Ajay Krishna. This is Scribe, a lightweight collaborative document workspace I built for Ajaia's full stack assignment. I focused on a complete create, edit, save, import, and share workflow rather than trying to recreate all of Google Docs. The app is publicly deployed and uses persistent cloud storage."
 
-**3:10–4:00 — Implementation choices**  
-Mention FastAPI, SQLite locally, Turso remotely, Quill Delta JSON for formatting, backend authorization, revision-based conflict rejection, and automated tests. Explain why a hosted database is necessary on free Render.
+## 0:25–1:20 — Create, format, and autosave
 
-**4:00–4:30 — AI and trade-offs**  
-Explain which parts you accelerated with ChatGPT, what you changed or rejected, how you tested, what is missing (real auth, simultaneous editing, complete Markdown), and which improvement comes next.
+**[SCREEN: Click New document. Rename it `Ajaia Walkthrough`. Type a short heading and two sentences. Highlight words and click Bold, Italic, and Underline. Add a heading and a bulleted list.]**
 
-**Before recording:** Use the actual deployed URL and visually verify everything. Keep the demo within five minutes. Share the recording as an unlisted Loom/YouTube link and put that URL in `walkthrough_url.txt`.
+"Users can create and rename documents directly in the editor. Quill gives the editor familiar rich-text controls such as bold, italic, underline, headings, and lists. Formatting is stored as structured Delta JSON, not raw HTML."
+
+**[SCREEN: Pause for `All changes saved`, return to dashboard, reopen the same document, refresh browser.]**
+
+"Changes autosave, and reopening or refreshing preserves both text and formatting."
+
+## 1:20–1:50 — Import a file
+
+**[SCREEN: Return to dashboard; click Import file; select `sample-import.md`; open the newly imported document.]**
+
+"I included document import for UTF-8 text and basic Markdown. The imported content becomes editable immediately. Full Markdown and DOCX conversion were deliberately left out to keep the assignment scoped."
+
+## 1:50–2:55 — Share and enforce permissions
+
+**[SCREEN: Switch back to Maya's walkthrough document. Open Share; select Noah Patel, choose Can edit, and grant access.]**
+
+"Every document has an owner. An owner can give another seeded user editing or viewing access."
+
+**[SCREEN: Switch top-right account from Maya to Noah. Click Shared with me; open the document; add a short line; wait for save.]**
+
+"Noah now sees the document under Shared with me and can edit it. Changes persist for the owner, too."
+
+**[SCREEN: Switch to Maya, open Share, change Noah's role to Can view. Switch to Noah and reopen the document; point out that editing is disabled.]**
+
+"With viewer permission, Noah can read but not edit. These checks also run in the backend, not just in the interface. Authentication is mocked through a two-user switcher for this demo; it is not production login security."
+
+## 2:55–3:45 — Architecture, tests, and persistence
+
+**[SCREEN: Show GitHub repository, then briefly `main.py`, `storage.py`, and `tests/test_app.py`. Optional: show a terminal with `7 passed` if you have run the tests locally.]**
+
+"The backend is Python FastAPI. The frontend is plain JavaScript and Quill, so there's no bundler to set up. SQLite works locally, while the deployed Render service connects to Turso for durable storage. The backend validates inputs and checks owner, editor, and viewer permissions. I also added revision checks so stale saves are rejected instead of silently overwriting newer content. Seven automated tests cover the core API behavior."
+
+**[SCREEN: Show live `/healthz` returning `storage: turso`. Show Turso's documents table and the saved walkthrough document. Never show database tokens.]**
+
+"I verified the live connection both through the health endpoint and by reading the saved document directly in Turso."
+
+## 3:45–4:35 — AI usage, fixes, and trade-offs
+
+**[SCREEN: Show AI_WORKFLOW.md, then quickly highlight the italic fix in `static/styles.css` and `static/index.html`; finish on the live Scribe dashboard.]**
+
+"I used ChatGPT to accelerate project scoping, API and UI scaffolding, test creation, and debugging. I didn't treat generated output as automatically correct. For example, italic formatting initially failed because the font settings suppressed italics. I corrected the CSS and loaded the proper font variants, then retested the editor. I also switched the deployed storage from local SQLite to Turso because Render's free disk isn't durable."
+
+"I intentionally skipped real-time editing, comments, version history, and real authentication. Given another few hours, I'd add genuine login, better edit-conflict recovery, and automated browser tests. The result is a focused, working product slice. Thanks for watching."
+
+## After recording
+
+1. Verify the video is **3–5 minutes** and visible without logging into your personal account (unlisted Loom/YouTube works).
+2. Paste the link into `walkthrough_url.txt`, `SUBMISSION.md`, and your final submission message.
+3. Keep the live Render URL and GitHub source link separately visible in `SUBMISSION.md`.
