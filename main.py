@@ -199,9 +199,58 @@ def update_document(doc_id: str, payload: UpdateDocument, request: Request):
     return {"document": present_doc(access_doc(request, doc_id))}
 
 
+@app.get("/api/documents/{doc_id}/versions")
+def list_document_versions(doc_id: str, request: Request):
+    access_doc(request, doc_id)
+    versions = db(request).all("""
+        SELECT revision,title,saved_at FROM document_versions
+        WHERE doc_id=? ORDER BY revision DESC LIMIT 30
+    """, doc_id)
+    return {"versions": versions}
+
+
+@app.get("/api/documents/{doc_id}/versions/{revision}")
+def get_document_version(doc_id: str, revision: int, request: Request):
+    access_doc(request, doc_id)
+    version = db(request).one("""
+        SELECT revision,title,delta_json,saved_at FROM document_versions
+        WHERE doc_id=? AND revision=?
+    """, doc_id, revision)
+    if not version:
+        raise HTTPException(404, "Saved version not found")
+    return {"version": {
+        "revision": version["revision"], "title": version["title"],
+        "saved_at": version["saved_at"], "delta": json.loads(version["delta_json"]),
+    }}
+
+
+class RestoreVersion(BaseModel):
+    current_revision: int = Field(ge=1)
+
+
+@app.post("/api/documents/{doc_id}/versions/{revision}/restore")
+def restore_document_version(doc_id: str, revision: int, payload: RestoreVersion, request: Request):
+    owner_doc(request, doc_id)
+    version = db(request).one("""
+        SELECT title,delta_json FROM document_versions WHERE doc_id=? AND revision=?
+    """, doc_id, revision)
+    if not version:
+        raise HTTPException(404, "Saved version not found")
+    updated = db(request).change("""
+        UPDATE documents SET title=?,delta_json=?,revision=revision+1,updated_at=?
+        WHERE id=? AND revision=?
+    """, version["title"], version["delta_json"], timestamp(), doc_id, payload.current_revision)
+    if updated == 0:
+        raise HTTPException(409, "This document has changed. Reopen it before restoring an older version.")
+    # The UPDATE trigger keeps the restored state as a NEW revision; the prior
+    # current state remains independently available in version history.
+    return {"document": present_doc(access_doc(request, doc_id), include_content=True)}
+
+
 @app.delete("/api/documents/{doc_id}", status_code=204)
 def delete_document(doc_id: str, request: Request):
     owner_doc(request, doc_id)
+    db(request).change("DELETE FROM document_versions WHERE doc_id=?", doc_id)
     db(request).change("DELETE FROM shares WHERE doc_id=?", doc_id)
     db(request).change("DELETE FROM documents WHERE id=?", doc_id)
     return Response(status_code=204)

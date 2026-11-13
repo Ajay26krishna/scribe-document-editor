@@ -122,7 +122,31 @@ SCHEMA = [
     )""",
     "CREATE INDEX IF NOT EXISTS idx_documents_owner ON documents(owner_id)",
     "CREATE INDEX IF NOT EXISTS idx_shares_user ON shares(user_id)",
+    """CREATE TABLE IF NOT EXISTS document_versions (
+        doc_id TEXT NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+        revision INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        delta_json TEXT NOT NULL,
+        saved_at TEXT NOT NULL,
+        PRIMARY KEY(doc_id, revision)
+    )""",
+    # A trigger keeps the document and its version in the same SQLite statement/transaction.
+    """CREATE TRIGGER IF NOT EXISTS document_versions_on_insert
+        AFTER INSERT ON documents
+        BEGIN
+            INSERT INTO document_versions(doc_id,revision,title,delta_json,saved_at)
+            VALUES(NEW.id,NEW.revision,NEW.title,NEW.delta_json,NEW.updated_at);
+        END""",
+    """CREATE TRIGGER IF NOT EXISTS document_versions_on_update
+        AFTER UPDATE ON documents
+        BEGIN
+            INSERT INTO document_versions(doc_id,revision,title,delta_json,saved_at)
+            VALUES(NEW.id,NEW.revision,NEW.title,NEW.delta_json,NEW.updated_at);
+            DELETE FROM document_versions
+            WHERE doc_id=NEW.id AND revision < NEW.revision-29;
+        END""",
 ]
+
 
 
 def initialize(db: Storage) -> None:
@@ -131,6 +155,10 @@ def initialize(db: Storage) -> None:
 
     for statement in SCHEMA:
         db.change(statement)
+    # Zero-downtime upgrade of an existing SQLite or Turso database: its current
+    # documents become the first available snapshot; earlier states cannot be recovered.
+    db.change("""INSERT OR IGNORE INTO document_versions(doc_id,revision,title,delta_json,saved_at)
+                 SELECT id,revision,title,delta_json,updated_at FROM documents""")
     db.change("INSERT OR IGNORE INTO users(id,name,email) VALUES(?,?,?)", "maya", "Maya Chen", "maya@demo.scribe")
     db.change("INSERT OR IGNORE INTO users(id,name,email) VALUES(?,?,?)", "noah", "Noah Patel", "noah@demo.scribe")
     if not db.one("SELECT id FROM documents LIMIT 1"):

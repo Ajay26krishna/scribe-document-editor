@@ -7,7 +7,7 @@
 
 - **Live product URL:** `PASTE_YOUR_WORKING_RENDER_URL_HERE`
 - **Source code (public GitHub):** https://github.com/Ajay26krishna/scribe-document-editor
-- **Google Drive submission folder:** `PASTE_SHARED_GOOGLE_DRIVE_FOLDER_URL_HERE`
+- **Google Drive submission folder:** https://drive.google.com/drive/folders/15yG8FJSZvjVO4L07SZjb0q-IKroBUhyO (enable Viewer link access before submitting)
 - **3–5 minute video walkthrough:** `PASTE_UNLISTED_VIDEO_URL_HERE`
 
 ## How to review in 60 seconds
@@ -17,6 +17,8 @@
 3. Click **Share**, grant **Noah Patel** (`noah@demo.scribe`) **Can edit**, then switch to Noah and find the document under **Shared with me**.
 4. Change Noah's role to **Can view** to demonstrate read-only access.
 5. Click **Import file** to upload a UTF-8 `.txt` or `.md` file (maximum 512 KB).
+6. On any document use **⋯ → Export to PDF** and select **Save as PDF** in the browser print dialog.
+7. Open **⋯ → Version history** to preview previous saves; as the document owner, choose an older revision and restore it as a new revision.
 
 **Access model:** The two accounts are simulated and selectable with no password. This is deliberate for evaluating the sharing workflow, not production authentication. Do not enter confidential content in this demo.
 
@@ -45,12 +47,14 @@
 | Local persistence | SQLite |
 | Hosted persistence | Turso; `/healthz` confirms Turso and SQL readback confirms writes |
 | Deployment | Render web service, functioning in browser |
-| Automated tests | Seven passing tests for key API behavior and adapter protocol |
+| Automated tests | Twelve passing tests, including history migration, restoration, retention and permissions |
+| Browser PDF export (stretch) | Implemented; verify using Chrome/Edge Print → Save as PDF on the deployed URL |
+| Bounded version history (stretch) | Implemented, local API tests pass; production Turso redeploy and manual verification pending |
 | Walkthrough video | Link pending recording |
 
 ## Deliberate exclusions and next 2–4 hours
 
-No real OAuth/login, emailed invitations, simultaneous editing, comments, version history, `.docx` import, complete Markdown rendering, or PDF export. With additional time I would add real authentication/invitations, safer conflict recovery with revision history, and Playwright end-to-end browser tests.
+No real OAuth/login, emailed invitations, simultaneous editing, comments, `.docx` import, or complete Markdown rendering. PDF uses the browser print dialog rather than a server-generated PDF file; history retains the last 30 **saved** revisions, and initial upgrade history starts from the document state at migration. With additional time I would add real authentication/invitations, unsaved-draft conflict recovery and version diffing, and Playwright end-to-end browser tests.
 
 ## Local setup (Windows PowerShell)
 
