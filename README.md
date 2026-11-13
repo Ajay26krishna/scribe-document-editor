@@ -7,7 +7,7 @@ Scribe is a deliberately scoped document editor: create or import documents, for
 
 ## 60-second reviewer quick start
 
-1. Open the **live URL** added to `SUBMISSION.md` after deployment.
+1. Open the **live URL** in `SUBMISSION.md` (the candidate must paste the final Render URL before submission).
 2. The default account is **Maya Chen**. Open **Welcome to Scribe**, format text, wait for **All changes saved**, then refresh to confirm persistence.
 3. Create a document, click **Share**, select **Noah Patel** and **Can edit**, and click **Grant access**.
 4. Switch the top-right demo account to **Noah Patel**. The document appears under **Shared with me** and is editable. Switch back to Maya to revoke access.
@@ -59,6 +59,8 @@ uvicorn main:app --reload
 
 Open **http://127.0.0.1:8000/**. The app creates `data/scribe.sqlite3`, creates tables, and seeds two demo users and example documents on first run. Data survives page refreshes and app restarts. Keep browser internet access enabled for Quill (jsDelivr) and optional Google Fonts.
 
+**Windows PowerShell without activating the environment:** `py -3 -m venv .venv`, then `.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt` and `.\.venv\Scripts\python.exe -m uvicorn main:app --reload`.
+
 **To reset the local demo:** stop the server, delete `data/scribe.sqlite3`, and restart.
 
 ### Run tests
@@ -95,7 +97,7 @@ The automated tests cover document CRUD and formatted content persistence, optim
 6. **Smoke-test on the deployed URL:** make a document, change formatting, wait for autosave, refresh; switch to Noah and verify that only shared documents are accessible; refresh again to verify remote persistence.
 7. Copy the deployed URL into `SUBMISSION.md` and your Google Drive handoff.
 
-**Important:** The source here includes a Turso HTTP protocol adapter and test-covered local SQLite path. Without your own Turso token and Render account, the hosted adapter and live deployment are **not yet verified end to end**. Do this smoke test before submitting. No reviewer needs a paid account.
+**Important:** **Deployment verified by the candidate:** The live Render application returned `{"status":"ok","storage":"turso"}` at `/healthz`, and a newly created document was confirmed in Turso database records. Reviewers do not need a paid account. Never commit the Turso token.
 
 Documentation: [Render FastAPI deployment](https://render.com/docs/deploy-fastapi), [Render free-tier filesystem limitations](https://render.com/docs/free), [Turso pricing](https://turso.tech/pricing), [Quill installation](https://quilljs.com/docs/installation).
 
@@ -162,4 +164,4 @@ scribe-assignment/
 
 ## AI use and responsible attribution
 
-AI was used to plan and generate an initial implementation and documentation. The candidate is responsible for **running the code independently, reviewing it, fixing any issues found, deploying the public version, recording the demo, and personalizing the AI workflow note to reflect what they actually did**. See `AI_WORKFLOW.md` for a starting draft that separates verified tests from pending manual checks.
+ChatGPT was used for scoping, implementation scaffolding, debugging, tests, and documentation. The candidate reviewed and corrected italic rendering, manually tested local and deployed behavior, configured Render + Turso, and verified a persisted document directly in the hosted database. See `AI_WORKFLOW.md` for a specific disclosure.
