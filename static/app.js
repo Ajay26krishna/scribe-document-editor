@@ -260,10 +260,16 @@ async function showDocMenu(doc) {
   const canDelete = doc.role === 'owner';
   $('#modal-root').innerHTML = `<div class="modal-backdrop"><div class="modal modal-small" role="dialog" aria-modal="true" aria-labelledby="options-heading">
   <div class="modal-title-row"><div><h2 id="options-heading">Document options</h2><p>More ways to work with this document.</p></div><button class="icon-button" id="close-modal" aria-label="Close">✕</button></div>
-  <div class="option-buttons"><button id="copy-doc-link" class="option-button">↗ <span>Copy document link</span></button>${canDelete ? '<button id="delete-doc" class="option-button danger-text">⌫ <span>Delete document</span></button>' : ''}</div>
+  <div class="option-buttons"><button id="copy-doc-link" class="option-button">↗ <span>Copy document link</span></button><button id="export-pdf" class="option-button">▤ <span>Export to PDF</span></button><button id="version-history" class="option-button">◷ <span>Version history</span></button>${canDelete ? '<button id="delete-doc" class="option-button danger-text">⌫ <span>Delete document</span></button>' : ''}</div>
   </div></div>`;
   modalEvents();
   $('#copy-doc-link').addEventListener('click', async () => {await copyLink(doc.id);closeModal();});
+  $('#export-pdf').addEventListener('click', async () => {
+    try {await flushSave();closeModal();exportCurrentDocPDF(doc);} catch(error){toast(error.message,true);}
+  });
+  $('#version-history').addEventListener('click', async () => {
+    try {await flushSave();await openVersionHistory(doc);} catch(error){toast(error.message,true);}
+  });
   $('#delete-doc')?.addEventListener('click', async () => {
     if (!window.confirm(`Delete “${doc.title}”? This cannot be undone.`)) return;
     try {await api(`/api/documents/${doc.id}`, {method:'DELETE'});closeModal();await refreshDocs();showDashboard('all');toast('Document deleted');}
@@ -274,6 +280,71 @@ async function showDocMenu(doc) {
 function modalEvents() {
   $('#close-modal')?.addEventListener('click',closeModal);
   $('.modal-backdrop')?.addEventListener('mousedown',e => {if(e.target.classList.contains('modal-backdrop')) closeModal();});
+}
+
+// Opens the system print dialog. Reviewers choose "Save as PDF" as the destination.
+// Print CSS removes application chrome and supports multi-page rich text.
+function exportCurrentDocPDF(doc) {
+  if (!state.editor || state.currentDoc?.id !== doc.id) return;
+  const previousTitle = document.title;
+  document.title = (state.currentDoc.title || 'Scribe document').replace(/[\\/:*?"<>|]/g, '-');
+  window.addEventListener('afterprint', () => {document.title = previousTitle;}, {once:true});
+  window.print();
+}
+
+async function openVersionHistory(doc) {
+  const {versions} = await api(`/api/documents/${doc.id}/versions`);
+  const isOwner = doc.role === 'owner';
+  $('#modal-root').innerHTML = `<div class="modal-backdrop"><div class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="history-heading">
+    <div class="modal-title-row"><div><span class="modal-eyebrow">DOCUMENT HISTORY</span><h2 id="history-heading">Version history</h2><p>Browse recent saved revisions. Restoring creates a new revision.</p></div><button class="icon-button" id="close-modal" aria-label="Close">✕</button></div>
+    <div class="history-layout"><div class="history-list" aria-label="Saved versions">
+      ${versions.map((version,i)=>`<button type="button" class="history-item ${i===0?'active':''}" data-history-revision="${version.revision}">
+        <strong>Version ${version.revision}${version.revision===doc.revision?' · Current':''}</strong>
+        <span>${escapeHTML(new Date(version.saved_at).toLocaleString())}</span>
+        <span class="history-item-title">${escapeHTML(version.title)}</span>
+      </button>`).join('') || '<p class="history-empty">No saved versions available.</p>'}
+    </div><div class="history-preview-panel"><div class="history-preview-header"><strong id="history-preview-label">Select a version</strong><span class="history-preview-note">Read-only formatted preview</span></div>
+      <div id="history-preview-holder" class="history-preview-holder"></div>
+      <div class="history-actions">${isOwner?'<button id="restore-version" class="btn btn-primary" type="button" disabled>Restore this version</button>':'<small>Only the document owner can restore versions.</small>'}</div>
+    </div></div><p class="history-footnote">Scribe retains the most recent 30 saved revisions. Existing documents start with a snapshot of their state when history was enabled.</p>
+  </div></div>`;
+  modalEvents();
+  $$('[data-history-revision]').forEach(button=>button.addEventListener('click',()=>{
+    showHistoryPreview(doc,Number(button.dataset.historyRevision)).catch(error=>toast(error.message,true));
+  }));
+  if (versions.length) await showHistoryPreview(doc,versions[0].revision);
+}
+
+async function showHistoryPreview(doc,revision) {
+  const {version} = await api(`/api/documents/${doc.id}/versions/${revision}`);
+  // Ignore stale async responses when the user has closed the history dialog.
+  if (!$('#history-preview-holder')) return;
+  $$('[data-history-revision]').forEach(button=>button.classList.toggle('active',Number(button.dataset.historyRevision)===revision));
+  $('#history-preview-label').textContent = `Version ${version.revision} — ${version.title}`;
+  $('#history-preview-holder').innerHTML = '<div id="history-preview-editor"></div>';
+  const preview = new Quill('#history-preview-editor', {theme:'snow',readOnly:true,modules:{toolbar:false},formats:['header','bold','italic','underline','strike','list','blockquote']});
+  preview.setContents(version.delta,'silent');
+  preview.enable(false);
+  const restoreButton=$('#restore-version');
+  if (restoreButton) {
+    restoreButton.disabled = revision === state.currentDoc?.revision;
+    restoreButton.onclick = async () => {
+      if (!window.confirm(`Restore version ${revision}? The current document will remain in history.`)) return;
+      try {
+        await flushSave();
+        const {document: restored} = await api(`/api/documents/${doc.id}/versions/${revision}/restore`,{
+          method:'POST',body:JSON.stringify({current_revision:state.currentDoc.revision}),
+        });
+        closeModal();
+        state.currentDoc=restored;
+        state.editVersion=0;
+        state.lastSavedVersion=0;
+        renderEditor(restored);
+        await refreshDocs();
+        toast(`Restored version ${revision} as revision ${restored.revision}`);
+      } catch(error) {toast(error.message,true);}
+    };
+  }
 }
 
 async function copyLink(id) {
