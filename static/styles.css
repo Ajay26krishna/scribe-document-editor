@@ -7,3 +7,46 @@
 @media(max-width:1150px){.sidebar{width:216px;flex-basis:216px}.dashboard-main{padding:42px 30px}.topbar{padding:0 25px}.editor-top{padding:15px 25px}.editor-toolbar-shell{padding:6px 18px}.editor-actions{gap:8px}}
 @media(max-width:850px){.sidebar{width:74px;flex-basis:74px;padding:23px 9px}.brand{padding:0;margin-bottom:40px;justify-content:center}.brand>span:last-child,.sidebar-overline,.new-doc,.import-doc,.nav-item:not(.active),.nav-count,.nav-item.active{font-size:0}.sidebar-section{margin-bottom:16px}.new-doc{font-size:0;width:50px;justify-content:center;padding:0}.new-doc span{font-size:25px}.import-doc{width:50px;justify-content:center;padding:0}.import-doc #upload-glyph{font-size:24px}.sidebar-key{display:none}.nav-item{width:50px;margin:4px 0;justify-content:center;padding:0}.nav-icon{font-size:21px}.help-card,.sidebar-footnote{display:none}.dashboard-main{padding:38px 24px}.dashboard-heading h1{font-size:26px}.stats-grid{gap:10px}.stat-card{padding:17px}.topbar{height:70px;flex-basis:70px}.editor-main{height:calc(100vh - 70px)}}
 @media(max-width:650px){.sidebar{display:none}.topbar{padding:0 15px;height:64px;flex-basis:64px}.account-label,.demo-pill{display:none}.dashboard-main{padding:25px 15px}.dashboard-heading{margin-bottom:25px}.dashboard-heading h1{font-size:24px}.dashboard-heading p{font-size:11px}.create-top{font-size:0;width:42px;padding:0}.create-top::first-letter{font-size:22px}.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:28px}.stat-card{padding:14px 10px}.stat-upper span:first-child{font-size:10px}.stat-card>strong{font-size:25px}.stat-card small{font-size:9px}.stat-icon{display:none}.section-title{flex-wrap:wrap;padding:19px}.search-box{width:100%;min-width:0}.list-head{grid-template-columns:1fr 75px 0 0;padding:12px}.list-head span:nth-child(3){display:none}.doc-row{grid-template-columns:1fr 75px 0 0;padding:13px}.document-details{margin-left:49px}.document-thumbnail{width:38px}.doc-date{display:none}.table-role{font-size:9px}.editor-main{height:calc(100vh - 64px)}.editor-top{padding:12px}.editor-doc-icon{display:none}.editor-title-wrap input{width:48vw;font-size:14px}.editor-subtitle{font-size:9px}.save-status{min-width:0;font-size:0}.btn-share{font-size:11px;padding:0 9px}.more-button{display:none}.editor-toolbar-shell{padding:4px 8px}.editor-toolbar-shell .ql-formats{margin-right:3px!important;padding-right:3px}.toolbar-side{display:none}.editor-scroll{padding:16px 8px}.paper{min-height:590px}.paper .ql-editor{padding:38px 27px;min-height:590px}.paper .ql-editor.ql-blank::before{left:27px;right:27px}.page-footer{padding:0 9px}.share-form-row{flex-wrap:wrap}.share-form-row #share-email{flex:1 1 100%}.share-form-row #share-role{flex:1}.share-form-row .btn{flex:1}.modal{padding:22px 17px}}
+
+/* Version history — preview uses a separate read-only Quill instance. */
+.history-modal{max-width:900px}
+.history-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px;min-height:360px}
+.history-list{max-height:425px;overflow:auto;border:1px solid #e9eaf1;border-radius:12px;background:#fafaff;padding:7px}
+.history-item{display:flex;flex-direction:column;gap:5px;align-items:flex-start;width:100%;text-align:left;padding:12px;border:1px solid transparent;border-radius:8px;background:transparent;color:#4b536d;margin-bottom:3px}
+.history-item:hover{background:#f1efff}
+.history-item.active{background:#efedff;border-color:#d7d1fc;color:#6150c6}
+.history-item strong{font-size:12px}
+.history-item span{font-size:10px;color:#9296a8}
+.history-item-title{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+.history-preview-panel{display:flex;flex-direction:column;min-width:0;border:1px solid #e9eaf1;border-radius:12px;overflow:hidden}
+.history-preview-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:5px;padding:13px 16px;border-bottom:1px solid #e9eaf1}
+.history-preview-header strong{font-size:12px;word-break:break-word}
+.history-preview-note{font-size:10px;color:#989cad}
+.history-preview-holder{flex:1;max-height:315px;min-height:235px;overflow:auto;background:white}
+.history-preview-holder .ql-container.ql-snow{border:0;font-family:'DM Sans',sans-serif;font-size:13px}
+.history-preview-holder .ql-editor{padding:20px;line-height:1.55;min-height:235px;white-space:normal}
+.history-preview-holder .ql-editor h1{font-size:23px}.history-preview-holder .ql-editor h2{font-size:19px}
+.history-actions{display:flex;justify-content:flex-end;padding:12px 15px;border-top:1px solid #e9eaf1}
+.history-actions .btn:disabled{opacity:.55;cursor:default}
+.history-actions small{color:#9a9eae;font-size:11px}
+.history-footnote{font-size:10px;line-height:1.5;color:#9c9fad;margin-top:16px}
+.history-empty{font-size:12px;color:#a5a9b6;padding:18px}
+@media(max-width:650px){.history-layout{grid-template-columns:1fr}.history-list{max-height:155px}.history-preview-holder{max-height:245px;min-height:160px}.history-modal{max-height:92vh;overflow:auto}}
+
+/* Export to PDF uses Chrome / Edge's Print → Save as PDF flow. */
+@page{size:A4;margin:17mm 16mm}
+@media print{
+  html,body{background:white!important;color:#222!important;height:auto!important;overflow:visible!important}
+  .sidebar,.topbar,.editor-top,.editor-toolbar-shell,.page-footer,
+  #modal-root,#toast,.modal-backdrop{display:none!important}
+  .app-shell,.right-side,.main-area,.editor-main,.editor-scroll,.paper,
+  .paper .ql-container.ql-snow,.paper .ql-editor{
+    display:block!important;position:static!important;height:auto!important;min-height:0!important;
+    width:auto!important;max-width:none!important;overflow:visible!important;
+    background:white!important;border:0!important;box-shadow:none!important;
+    margin:0!important;padding:0!important;
+  }
+  .paper .ql-editor{font-size:11pt!important;line-height:1.5!important;color:#222!important}
+  .paper .ql-editor h1,.paper .ql-editor h2,.paper .ql-editor h3{break-after:avoid}
+  .paper .ql-editor p,.paper .ql-editor li{orphans:2;widows:2}
+}
