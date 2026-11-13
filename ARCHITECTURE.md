@@ -1,55 +1,49 @@
-# Architecture and trade-offs — Scribe
+# Architecture and engineering trade-offs — Scribe
 
-## Problem framing
+**Project:** Scribe — lightweight shared document workspace  
+**Assignment:** Ajaia AI-Native Full Stack Developer  
+**Source:** https://github.com/Ajay26krishna/scribe-document-editor
 
-The most valuable deliverable within 4–6 hours is not a Google Docs clone; it is a trustworthy document workflow. I prioritized *create → edit → autosave → reopen* and *owner → share → switch account → confirm enforcement*. Both are demonstrable in a short video.
+## Product scope and priorities
 
-## High-level flow
+I scoped the app to two complete, testable workflows: **create → format → autosave → reopen** and **owner → share → switch user → enforce a viewer/editor role**. A usable editor, durable persistence, and backend permission checks matter more here than half-built Google Docs features.
 
-```text
-Browser (HTML/CSS/JS, Quill editor)
-            |
-        JSON + multipart
-            |
-      FastAPI REST routes
-            |
-    Server-side validation
-    + authorization checks
-            |
-      Storage abstraction
-      /               \
-SQLite file (local)   Turso/libSQL HTTP (deployed)
-```
-
-- **Document data** is stored as **Quill Delta JSON**, not raw HTML; formatting is preserved, and only approved text operations and attributes can be saved.
-- **Users** are two seeded accounts (`maya`, `noah`). A demo cookie chooses the identity; this is a simulated sign-in by design. This is not secure authentication.
-- **Roles:** owner (read/edit/share/delete), editor (read/edit), viewer (read only), and unshared (no access).
-- **Authorization:** GET, PATCH, DELETE and sharing routes re-evaluate document ownership or membership in the `shares` table. Documents inaccessible to the acting user return `404`.
-- **Autosave:** client debounces by 700 ms and sends the latest title and Delta. `revision` supports optimistic concurrency; stale saves return HTTP 409 rather than silently overwriting the document. Writes in flight are serialized in the client.
-- **Import:** uploaded bytes are UTF-8 decoded, length-checked, and converted into safe Delta text operations. Markdown uses a limited, documented parser rather than arbitrary uploaded HTML.
-- **Persistence:** the storage interface accepts bound parameters for both local SQLite and remote Turso. A hosted database avoids losing data when a free Render web service restarts.
-
-## Schema
+## Architecture
 
 ```text
-users(id PK, name, email UNIQUE)
-documents(id PK, owner_id FK, title, delta_json, revision, created_at, updated_at)
-shares(doc_id FK, user_id FK, role, PRIMARY KEY(doc_id, user_id))
+Browser (HTML, CSS, JavaScript, Quill 2)
+          | REST JSON + multipart import
+          v
+FastAPI: validation / document routes / permission checks
+          |
+          v
+SQL adapter (storage.py)
+     /               \
+SQLite locally       Turso/libSQL over HTTPS on Render
 ```
 
-All access is evaluated on the server; the account selected in the browser is never accepted as a free-form `owner_id` in write payloads.
+- **Frontend:** Quill handles text selection, formatting, headings, and lists. Vanilla JS manages account switching, document lists, editor state, save indicators, sharing, import, and error feedback.
+- **Persistence:** document structure is stored as **Quill Delta JSON** rather than untrusted HTML, preserving formatting. The same SQL schema is used with local SQLite and hosted Turso.
+- **Schema:** `users(id, name, email)`, `documents(id, owner_id, title, delta_json, revision, created_at, updated_at)`, and `shares(doc_id, user_id, role)`.
+- **Identity model:** Maya Chen and Noah Patel are seeded demo users. A cookie-backed account selector simulates authentication, explicitly **not a production security boundary**.
+- **Access:** owners can edit, delete, and manage sharing; editors can read/edit; viewers can only read. Backend routes enforce authorization and return not-found/forbidden-style responses rather than trusting disabled UI buttons.
+- **Autosave:** text is saved after a roughly 700 ms debounce. A `revision` integer enables optimistic concurrency: stale writes produce HTTP 409 instead of silently replacing newer content.
+- **File handling:** UTF-8 `.txt` and a documented subset of `.md` are parsed into safe Quill Delta operations; uploads are size-checked. Full Markdown and `.docx` imports were excluded to stay within the timebox.
 
-## Why this stack?
+## Why these technology choices?
 
-- **FastAPI + SQLite:** minimal setup, fast iteration, good request-validation support, real integration tests, and easy deployability as one web service.
-- **Quill 2:** handles cursor behavior, formatting, lists, and Delta persistence much better than inventing a `contenteditable` editor under time pressure.
-- **Vanilla browser JavaScript:** avoids a bundler and keeps the product slice inspectable. For a larger team/product I would choose a component framework and client data-fetching library.
-- **Turso for deployment:** retains SQLite semantics while providing persistent storage without paying for a Render disk. No database token is sent to the browser.
+**FastAPI + SQLite:** simple routes, minimal local setup, built-in validation, and meaningful integration tests without a large framework. **Quill:** solves rich-text cursor/selection issues reliably, avoiding a fragile custom `contenteditable` implementation. **Turso:** keeps SQLite-compatible query semantics while providing durable hosted storage; Render's free instance disk would not be suitable for long-lived documents. **Render:** simple, accessible public Python deployment with a reusable `render.yaml`.
 
-## Correctness and limits
+## Verification performed
 
-- Seven automated tests cover local API behavior and remote Turso protocol serialization. Local API tests validate ownership, shared editing, read-only denial, revocation, rename/format persistence, conflict handling, and import rules.
-- The remote Turso path uses the documented Hrana HTTP pipeline protocol; an actual remote-database smoke test is still needed with a real database token.
-- Browser rich-text usability needs candidate-led visual/manual testing on a machine with internet access. Browser-based end-to-end automation has not yet been claimed.
-- Scope cuts: no simultaneous editing, Google Docs-format import, threaded comments, emailed invites, OAuth, version snapshots, or link-based permission bypass.
-- Production hardening would include real identity, CSRF protections, structured audit events, rate limits, file scanning if attachments are added, durable migrations, and observability.
+- Seven automated pytest cases covering document data, formatting persistence, permissions, role changes/revocation, conflicts, imports, and the Turso adapter protocol.
+- Candidate-tested local editor including the italic-font correction, content saving/reopening, and sharing.
+- Candidate-tested live Render deployment, account-based sharing, and remote persistence. `/healthz` reported `{"status":"ok","storage":"turso"}`; a newly created test document was confirmed in Turso's actual `documents` table.
+- Turso's dashboard usage counters are not used as proof of data integrity; direct database reads and application behavior provide the verification.
+
+## Intentional cuts and next 2–4 hours
+
+- **Not built:** real login/OAuth, emailed invitations, simultaneous live editing, comments, history, full Markdown or `.docx`, PDF export, and production hardening.
+- **Next:** (1) real authentication and invitations, (2) improved stale-edit recovery or version snapshots, (3) browser-level Playwright tests and accessibility improvements.
+
+**Operational warning:** Because the identity switcher is available to all demo visitors, the live environment is a functional evaluation demo, not a private document store. Do not enter confidential information.
