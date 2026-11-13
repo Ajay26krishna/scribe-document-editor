@@ -10,7 +10,7 @@ Scribe is a deliberately scoped document editor: create or import documents, for
 - **Live product:** https://scribe-document-editor.onrender.com/
 - **Source code:** https://github.com/Ajay26krishna/scribe-document-editor
 - **Google Drive submission folder:** https://drive.google.com/drive/folders/1D_1d2RU141d1XaFQa10AVHJoj_DpfEcy?usp=sharing
-- **Walkthrough video:** pending recording (see `walkthrough_url.txt`).
+- **Walkthrough video:** https://youtu.be/QPelKQ8fE3Y (unlisted; verify playback before submitting).
 
 ## 60-second reviewer quick start
 
