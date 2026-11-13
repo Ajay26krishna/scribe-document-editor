@@ -1,69 +1,57 @@
-# Scribe — 4–5 minute walkthrough script
+# Scribe — 4–5 minute walkthrough narration
 
-**Before recording:** Open the deployed Scribe URL in Chrome and enlarge it to comfortable zoom. Keep a code editor ready on `main.py`, `storage.py`, and `tests/test_app.py`; keep Turso open on the `documents` table or SQL editor. Hide tabs that expose credentials, tokens, or private accounts. Start with **Maya Chen** selected. Use the `sample-import.md` file from the project. The words in **bold brackets** tell you what to show on screen, not what to read aloud.
+**Live demo:** https://scribe-document-editor.onrender.com/  
+**Repository:** https://github.com/Ajay26krishna/scribe-document-editor  
+**Length:** Target 4:30–4:55. Read spoken paragraphs naturally. **Instructions in square brackets are screen actions and should not be spoken.**
 
-## 0:00–0:25 — Product and scope
+**Before recording:** Keep Chrome/Edge open on Scribe, have `sample-import.md` ready for upload, sign in to GitHub in another tab, and open the Turso documents table or SQL editor (without exposing tokens). Use Maya Chen initially. If you demonstrate the version restore, create at least two saved revisions before recording or do so on camera. Avoid confidential data.
 
-**[SCREEN: Show deployed Scribe dashboard, move cursor over New document, Import file, My documents, and Shared with me.]**
+## 0:00–0:25 — Introduction
 
-"Hi, I'm Ajay Krishna. This is Scribe, a lightweight collaborative document workspace I built for Ajaia's full stack assignment. I focused on a complete create, edit, save, import, and share workflow rather than trying to recreate all of Google Docs. The app is publicly deployed and uses persistent cloud storage."
+**[SCREEN: Open https://scribe-document-editor.onrender.com/. Show the clean dashboard, New document, Import file, Owned by me, and Shared with me.]**
 
-## 0:25–1:20 — Create, format, and autosave
+"Hi, I'm Ajay Krishna. This is Scribe, a lightweight shared document workspace built for Ajaia's AI-Native Full Stack Developer assignment. I focused on completing the document workflow end to end—editing, autosaving, importing, and sharing—rather than attempting to recreate every Google Docs feature."
 
-**[SCREEN: Click New document. Rename it `Ajaia Walkthrough`. Type a short heading and two sentences. Highlight words and click Bold, Italic, and Underline. Add a heading and a bulleted list.]**
+## 0:25–1:10 — Editing and persistence
 
-"Users can create and rename documents directly in the editor. Quill gives the editor familiar rich-text controls such as bold, italic, underline, headings, and lists. Formatting is stored as structured Delta JSON, not raw HTML."
+**[SCREEN: Click New document. Rename it Ajaia Walkthrough. Add a heading, two sentences, bold text, italic, underline, and a bulleted list. Show the save indicator. Return to the dashboard, reopen the same document, then refresh.]**
 
-**[SCREEN: Pause for `All changes saved`, return to dashboard, reopen the same document, refresh browser.]**
+"Users can create and rename documents and apply familiar rich-text formatting using Quill. The editor stores structured Delta JSON so formatting survives saving and reopening. Changes autosave with a visible status. Even after refreshing, the content and formatting remain available."
 
-"Changes autosave, and reopening or refreshing preserves both text and formatting."
+## 1:10–1:30 — Import
 
-## 1:15–1:40 — Import a file
+**[SCREEN: Return to the dashboard, choose Import file, select sample-import.md, and briefly show the imported editable content.]**
 
-**[SCREEN: Return to dashboard; click Import file; select `sample-import.md`; open the newly imported document.]**
+"I also added a practical import flow for UTF-8 text and basic Markdown files. Imported content becomes a new editable document. I limited the formats intentionally to keep the workflow reliable."
 
-"I included document import for UTF-8 text and basic Markdown. The imported content becomes editable immediately. Full Markdown and DOCX conversion were deliberately left out to keep the assignment scoped."
+## 1:30–2:20 — Sharing and roles
 
-## 1:40–2:35 — Share and enforce permissions
+**[SCREEN: Open the walkthrough document as Maya. Click Share, select Noah Patel and Can edit, and grant access. Switch the account to Noah, open Shared with me, make an edit, and wait for autosave. Switch to Maya and set Noah to Can view, then switch back to show the read-only editor.]**
 
-**[SCREEN: Switch back to Maya's walkthrough document. Open Share; select Noah Patel, choose Can edit, and grant access.]**
+"Each document has an owner, and the owner can grant editing or viewing permissions. Noah can see a document shared with him, and his edits are reflected for Maya. When he's changed to a viewer, editing is disabled. The important point is that these permissions are checked in FastAPI, not only in the browser. Authentication is intentionally simulated with two seeded accounts for the demo."
 
-"Every document has an owner. An owner can give another seeded user editing or viewing access."
+## 2:20–3:05 — Two stretch features
 
-**[SCREEN: Switch top-right account from Maya to Noah. Click Shared with me; open the document; add a short line; wait for save.]**
+**[SCREEN: As Maya, reopen the document. Click ⋯ → Export to PDF. In the browser print dialog select Save as PDF and show that only the document is printed. Return to Scribe and click ⋯ → Version history. Select an earlier revision to preview. Restore it as Maya and show the new current revision.]**
 
-"Noah now sees the document under Shared with me and can edit it. Changes persist for the owner, too."
+"After finishing the core requirements, I added two scoped enhancements. Export to PDF produces a print-friendly page through the browser's Save as PDF flow. Version history keeps up to thirty saved revisions and previews their formatting. Only an owner can restore an older revision, and restoring creates a new revision rather than deleting the more recent history."
 
-**[SCREEN: Switch to Maya, open Share, change Noah's role to Can view. Switch to Noah and reopen the document; point out that editing is disabled.]**
+## 3:05–3:50 — Architecture and verification
 
-"With viewer permission, Noah can read but not edit. These checks also run in the backend, not just in the interface. Authentication is mocked through a two-user switcher for this demo; it is not production login security."
+**[SCREEN: Open https://github.com/Ajay26krishna/scribe-document-editor. Show main.py, storage.py, and tests/test_version_history.py. Briefly show the terminal with `12 passed`. Then show https://scribe-document-editor.onrender.com/healthz and a Turso documents-table entry. Never show database credentials.]**
 
-## 2:35–3:15 — PDF export and saved versions (optional stretch)
+"The stack uses FastAPI for validation and REST APIs, vanilla JavaScript and Quill for the frontend, and SQLite-compatible storage. SQLite runs locally; the deployed Render service connects to Turso for durable cloud data. Autosaves use revision checks to reject stale writes. Twelve automated tests pass, covering document behavior, sharing, conflicts, migration, and version restoration. I also confirmed hosted persistence by finding a document created on the live site in Turso."
 
-**[SCREEN: In the document, click the ⋯ menu → Export to PDF; select Save as PDF in the Chrome print preview. Then open ⋯ → Version history. Click an earlier save and show its formatted preview. As Maya, restore an older revision and show the updated editor.]**
+## 3:50–4:40 — AI-native workflow, bug fix, and trade-offs
 
-"I added two scoped enhancements after the core app was working. Export to PDF uses a print-friendly layout and the browser's Save as PDF option. Version history keeps the most recent 30 saved revisions, lets anyone with document access preview them, and lets only the owner restore an older revision. Restoring creates a new version, so the previous latest state isn't destroyed."
+**[SCREEN: Show AI_WORKFLOW.md on GitHub. Open static/styles.css to point at `font-synthesis:auto`; open static/index.html and point at Google Fonts italic variants. Return to Scribe.]**
 
-## 3:15–3:55 — Architecture, tests, and persistence
+"I used ChatGPT to help scope the assignment, accelerate the initial API and UI scaffolding, create test cases, debug issues, and plan deployment. I still verified the output myself. For example, italic formatting initially wasn't rendering because the font setup suppressed it. I adjusted the CSS and loaded real italic font variants, then tested it again. I also used Turso instead of relying on Render's temporary local storage, and added automated checks around history and permissions."
 
-**[SCREEN: Show GitHub repository, then briefly `main.py`, `storage.py`, and `tests/test_app.py`. Optional: show a terminal with `12 passed` if you have run the tests locally.]**
-
-"The backend is Python FastAPI. The frontend is plain JavaScript and Quill, so there's no bundler to set up. SQLite works locally, while the deployed Render service connects to Turso for durable storage. The backend validates inputs and checks owner, editor, and viewer permissions. I also added revision checks so stale saves are rejected instead of silently overwriting newer content. Twelve automated tests cover the API, version snapshots, restore permissions, migration, and conflicts."
-
-**[SCREEN: Show live `/healthz` returning `storage: turso`. Show Turso's documents table and the saved walkthrough document. Never show database tokens.]**
-
-"I verified the live connection both through the health endpoint and by reading the saved document directly in Turso."
-
-## 3:55–4:45 — AI usage, fixes, and trade-offs
-
-**[SCREEN: Show AI_WORKFLOW.md, then quickly highlight the italic fix in `static/styles.css` and `static/index.html`; finish on the live Scribe dashboard.]**
-
-"I used ChatGPT to accelerate project scoping, API and UI scaffolding, test creation, and debugging. I didn't treat generated output as automatically correct. For example, italic formatting initially failed because the font settings suppressed italics. I corrected the CSS and loaded the proper font variants, then retested the editor. I also switched the deployed storage from local SQLite to Turso because Render's free disk isn't durable."
-
-"I intentionally skipped real-time editing, comments, and real authentication. Given another few hours, I'd add genuine login, better edit-conflict recovery, and automated browser tests. After finishing the core requirements, I added PDF export and limited version history. The result is a focused, working product slice. Thanks for watching."
+"I chose not to add real-time simultaneous editing, comments, or production authentication within this scope. With more time, my next improvements would be proper login, better conflict recovery, and automated browser tests. Thank you for watching."
 
 ## After recording
 
-1. Verify the video is **3–5 minutes** and visible without logging into your personal account (unlisted Loom/YouTube works).
-2. Paste the link into `walkthrough_url.txt`, `SUBMISSION.md`, and your final submission message.
-3. Keep the live Render URL and GitHub source link separately visible in `SUBMISSION.md`.
+1. Keep the recording between **3 and 5 minutes**. Trim unused loading or print-dialog time.
+2. Upload to Loom or YouTube as an unlisted or otherwise accessible video. Open the link in an Incognito window to verify reviewer access.
+3. Paste its **actual URL** into `walkthrough_url.txt` and `SUBMISSION.md`, update those files in GitHub and Google Drive, and only then submit.
