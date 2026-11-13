@@ -24,7 +24,7 @@ SQLite locally       Turso/libSQL over HTTPS on Render
 
 - **Frontend:** Quill handles text selection, formatting, headings, and lists. Vanilla JS manages account switching, document lists, editor state, save indicators, sharing, import, and error feedback.
 - **Persistence:** document structure is stored as **Quill Delta JSON** rather than untrusted HTML, preserving formatting. The same SQL schema is used with local SQLite and hosted Turso.
-- **Schema:** `users(id, name, email)`, `documents(id, owner_id, title, delta_json, revision, created_at, updated_at)`, and `shares(doc_id, user_id, role)`.
+- **Schema:** `users(id, name, email)`, `documents(id, owner_id, title, delta_json, revision, created_at, updated_at)`, and `shares(doc_id, user_id, role)`, and `document_versions(doc_id, revision, title, delta_json, saved_at)`.
 - **Identity model:** Maya Chen and Noah Patel are seeded demo users. A cookie-backed account selector simulates authentication, explicitly **not a production security boundary**.
 - **Access:** owners can edit, delete, and manage sharing; editors can read/edit; viewers can only read. Backend routes enforce authorization and return not-found/forbidden-style responses rather than trusting disabled UI buttons.
 - **Autosave:** text is saved after a roughly 700 ms debounce. A `revision` integer enables optimistic concurrency: stale writes produce HTTP 409 instead of silently replacing newer content.
@@ -36,14 +36,18 @@ SQLite locally       Turso/libSQL over HTTPS on Render
 
 ## Verification performed
 
-- Seven automated pytest cases covering document data, formatting persistence, permissions, role changes/revocation, conflicts, imports, and the Turso adapter protocol.
+- Twelve automated pytest cases covering document data, formatting persistence, permissions, role changes/revocation, conflicts, imports, the Turso adapter protocol, snapshots, restore, history permissions, migration, and retention.
 - Candidate-tested local editor including the italic-font correction, content saving/reopening, and sharing.
 - Candidate-tested live Render deployment, account-based sharing, and remote persistence. `/healthz` reported `{"status":"ok","storage":"turso"}`; a newly created test document was confirmed in Turso's actual `documents` table.
 - Turso's dashboard usage counters are not used as proof of data integrity; direct database reads and application behavior provide the verification.
 
 ## Intentional cuts and next 2–4 hours
 
-- **Not built:** real login/OAuth, emailed invitations, simultaneous live editing, comments, history, full Markdown or `.docx`, PDF export, and production hardening.
-- **Next:** (1) real authentication and invitations, (2) improved stale-edit recovery or version snapshots, (3) browser-level Playwright tests and accessibility improvements.
+- **Added after the core scope was stable:** browser print-to-PDF and a bounded (30-save) history with formatted preview and owner-only restore.
+- **Not built:** real login/OAuth, emailed invitations, simultaneous live editing, comments, complete Markdown or `.docx`, and production hardening.
+- **Version history design:** SQLite/libSQL `AFTER INSERT` and `AFTER UPDATE` triggers atomically snapshot a document each time its data is saved. The `document_versions` table stores `(doc_id, revision, title, delta_json, saved_at)`; it keeps the newest 30 revisions. On upgrade, existing documents are backfilled from their current state once. Restoring an old snapshot increments the current revision and also saves the restored state as a new version. A `current_revision` precondition prevents racing another editor. Anyone with access can preview history; only the owner can restore.
+- **PDF design:** a frontend print action and `@media print` CSS remove the app chrome and let the rich-text page flow across printed sheets. No PDF library, backend storage, or build step is needed. Users select Save as PDF in the browser dialog.
+- **Next:** (1) real authentication and invitations, (2) improved stale-draft conflict recovery and diff/compare UI, (3) browser-level Playwright tests and accessibility improvements.
+- **Verification boundary:** history endpoints and SQLite migration are covered by automated tests; the new features still require a manual production-browser check against the configured Turso database before presenting them as verified live.
 
 **Operational warning:** Because the identity switcher is available to all demo visitors, the live environment is a functional evaluation demo, not a private document store. Do not enter confidential information.
