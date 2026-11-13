@@ -1,5 +1,6 @@
 # Scribe — 4–5 minute walkthrough narration
 
+**Recorded walkthrough:** https://youtu.be/QPelKQ8fE3Y (unlisted; public playback pending verification)  
 **Live demo:** https://scribe-document-editor.onrender.com/  
 **Repository:** https://github.com/Ajay26krishna/scribe-document-editor  
 **Length:** Target 4:30–4:55. Read spoken paragraphs naturally. **Instructions in square brackets are screen actions and should not be spoken.**
@@ -50,8 +51,6 @@
 
 "I chose not to add real-time simultaneous editing, comments, or production authentication within this scope. With more time, my next improvements would be proper login, better conflict recovery, and automated browser tests. Thank you for watching."
 
-## After recording
+## Recorded video and access check
 
-1. Keep the recording between **3 and 5 minutes**. Trim unused loading or print-dialog time.
-2. Upload to Loom or YouTube as an unlisted or otherwise accessible video. Open the link in an Incognito window to verify reviewer access.
-3. Paste its **actual URL** into `walkthrough_url.txt` and `SUBMISSION.md`, update those files in GitHub and Google Drive, and only then submit.
+The edited 4:35 walkthrough was uploaded to YouTube as an unlisted video: https://youtu.be/QPelKQ8fE3Y. Before final submission, check that the video has finished processing and opens in an Incognito window without signing in. The link is included in `README.md`, `SUBMISSION.md`, and `walkthrough_url.txt`.
